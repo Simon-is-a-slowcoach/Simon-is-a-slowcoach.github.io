@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Simon is a slowcoach.</title>
+  <subtitle>Better late than never.</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="https://simon-is-a-slowcoach.github.io/"/>
+  <updated>2016-11-05T14:53:18.000Z</updated>
+  <id>https://simon-is-a-slowcoach.github.io/</id>
+  
+  <author>
+    <name>Simon</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>关于NSDecimalNumber的一点总结</title>
+    <link href="https://simon-is-a-slowcoach.github.io/2016/11/05/something-about-NSDecimalNumber/"/>
+    <id>https://simon-is-a-slowcoach.github.io/2016/11/05/something-about-NSDecimalNumber/</id>
+    <published>2016-11-05T13:38:39.000Z</published>
+    <updated>2016-11-05T14:53:18.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>&emsp;&emsp;最近工作中遇到一些关于浮点数的问题, 在这里总结一下:<br>&emsp;&emsp;1.如何由一个double的数据得到一个NSDecimalNumber:<br>&emsp;&emsp;经过一阵乱测发现 由 <code>+numberWithFloat:</code>, <code>+numberWithDouble:</code>, <code>-initWithFloat:</code>, <code>-initWithDouble:</code>等方法由float/double直接转NSDecimalNumber会有精度问题. 并在<a href="http://stackoverflow.com/questions/5304855/proper-way-to-instantiate-an-nsdecimalnumber-from-float-or-double/5304993#5304993" target="_blank" rel="external">stackoverflow的某个回复</a>得到了验证:<br>&emsp;&emsp;So the most consistently accurate conversion/initialisation from a double or float to NSDecimalNumber is using <code>decimalNumberWithString:</code>. But, as Brad Larson has pointed out in his answer, this might be a little slow. His technique for conversion using NSScanner might be better if performance becomes an issue.<br>&emsp;&emsp;那么, 如何由double得到一个NSDecimalNumber呢?<br>&emsp;&emsp;(1)用<code>stringWithFormat:</code>由double得到NSString, 再经<code>decimalNumberWithString:</code>由NSString得到NSDecimalNumber, 这方法貌似精度问题不会出现, 但是可能有一个效率不是很高的问题;<br>&emsp;&emsp;(2)之前引用的那个回复有提到的<a href="http://stackoverflow.com/questions/5304855/proper-way-to-instantiate-an-nsdecimalnumber-from-float-or-double/5305836#5305836" target="_blank" rel="external">1个据说比方法(1)更快的方法</a>:<br>&emsp;&emsp;通过<code>stringWithFormat:</code>由double得到NSString, 再通过<code>[[(NSScanner *) scannerWithString:] scanDecimal:]</code>由NSString得到NSDecimal, 最后通过<code>decimalNumberWithDecimal:</code>由NSDecimal得到NSDecimalNumbe;<br>&emsp;&emsp;2.使用NSDecimalNumber就一定比double等更稳妥更让人放心吗?<br>&emsp;&emsp;我觉得不完全是的, 尤其是将一个无限循环小数的double转为NSDecimalNumber并用于计算的时候,比如:<br><figure class="highlight obj-c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">double</span> u = <span class="number">2.0</span> / <span class="number">3</span>;</div><div class="line"><span class="keyword">double</span> v = u * <span class="number">3</span>;</div><div class="line"><span class="built_in">NSDecimalNumber</span> *w = [<span class="built_in">NSDecimalNumber</span> decimalNumberWithString:[<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"%f"</span>, u]];</div><div class="line"><span class="built_in">NSDecimalNumber</span> *x = [w decimalNumberByMultiplyingBy:[<span class="built_in">NSDecimalNumber</span> decimalNumberWithString:<span class="string">@"3"</span>]];</div><div class="line"><span class="built_in">NSLog</span>(<span class="string">@"%f * %d = %f\n %@ * %d = %@"</span>, u, <span class="number">3</span>, v, w, <span class="number">3</span>, x);</div></pre></td></tr></table></figure></p>
+<p>&emsp;&emsp;输出为:<br><figure class="highlight obj-c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="number">0.666667</span> * <span class="number">3</span> = <span class="number">2.000000</span> <span class="comment">//double计算得到</span></div><div class="line"><span class="number">0.666667</span> * <span class="number">3</span> = <span class="number">2.000001</span> <span class="comment">//(0.666667 * 3)NSDecimalNumber计算得到</span></div></pre></td></tr></table></figure></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&amp;emsp;&amp;emsp;最近工作中遇到一些关于浮点数的问题, 在这里总结一下:&lt;br&gt;&amp;emsp;&amp;emsp;1.如何由一个double的数据得到一个NSDecimalNumber:&lt;br&gt;&amp;emsp;&amp;emsp;经过一阵乱测发现 由 &lt;code&gt;+numberWithFl
+    
+    </summary>
+    
+    
+      <category term="iOS" scheme="https://simon-is-a-slowcoach.github.io/tags/iOS/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>关于二分查找的一点备注</title>
+    <link href="https://simon-is-a-slowcoach.github.io/2016/10/31/something-about-binary-search/"/>
+    <id>https://simon-is-a-slowcoach.github.io/2016/10/31/something-about-binary-search/</id>
+    <published>2016-10-30T16:04:50.000Z</published>
+    <updated>2016-11-05T14:53:14.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>&emsp;&emsp;同Cifer讨论二分查找时遇到的细节问题, 在这里备注一下:<br>&emsp;&emsp;1.如果该(有序的)列表里可能有重复的元素, 那么在二分查找的过程中找到的index值为第一个还是最后一个?<br>&emsp;&emsp;最终代码(假设列表中的元素为升序):<br>&emsp;&emsp;查找到的index为第1个:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">firstPosition</span><span class="params">(nums, target)</span>:</span></div><div class="line">    length = len(nums)</div><div class="line">    <span class="keyword">if</span> length == <span class="number">0</span>:</div><div class="line">        <span class="keyword">return</span> <span class="number">-1</span></div><div class="line">    start, end = <span class="number">0</span>, length - <span class="number">1</span></div><div class="line">    <span class="keyword">while</span> start + <span class="number">1</span> &lt; end:</div><div class="line">        mid = (start + end) // <span class="number">2</span></div><div class="line">        <span class="keyword">if</span> nums[mid] &lt; target:</div><div class="line">            start = mid</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            end = mid</div><div class="line">    <span class="keyword">if</span> nums[start] == target:</div><div class="line">        <span class="keyword">return</span> start</div><div class="line">    <span class="keyword">elif</span> nums[end] == target:</div><div class="line">        <span class="keyword">return</span> end</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        <span class="keyword">return</span> <span class="number">-1</span></div></pre></td></tr></table></figure></p>
+<p>&emsp;&emsp;查找到的index为最后1个:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">lastPosition</span><span class="params">(nums, target)</span>:</span></div><div class="line">    length = len(nums)</div><div class="line">    <span class="keyword">if</span> length == <span class="number">0</span>:</div><div class="line">        <span class="keyword">return</span> <span class="number">-1</span></div><div class="line">    start, end = <span class="number">0</span>, length - <span class="number">1</span></div><div class="line">    <span class="keyword">while</span> start + <span class="number">1</span> &lt; end:</div><div class="line">        mid = (start + end) // <span class="number">2</span></div><div class="line">        <span class="keyword">if</span> nums[mid] &gt; target:</div><div class="line">            end = mid</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            start = mid</div><div class="line">    <span class="keyword">if</span> nums[end] == target:</div><div class="line">        <span class="keyword">return</span> end</div><div class="line">    <span class="keyword">elif</span> nums[start] == target:</div><div class="line">        <span class="keyword">return</span> start</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        <span class="keyword">return</span> <span class="number">-1</span></div></pre></td></tr></table></figure></p>
+<p>&emsp;&emsp;2.用二分法求一个整数的平方根, 取整数就好, 比如求3的平方根得到1, 求5的平方根得到2(<a href="https://leetcode.com/problems/sqrtx/" target="_blank" rel="external">https://leetcode.com/problems/sqrtx/</a>):<br>&emsp;&emsp;我写的答案(还有很大空间可优化):</p>
+<pre><code class="python"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span><span class="params">(object)</span>:</span>
+    <span class="function"><span class="keyword">def</span> <span class="title">mySqrt</span><span class="params">(self, x)</span>:</span>
+        <span class="string">"""
+        :type x: int
+        :rtype: int
+        """</span>
+        start, end = <span class="number">0</span>, x
+        <span class="keyword">while</span> start + <span class="number">1</span> &lt; end:
+            mid = (start + end) // <span class="number">2</span>
+            <span class="keyword">if</span> mid ** <span class="number">2</span> &gt; x:
+                end = mid
+            <span class="keyword">else</span>:
+                start = mid
+        <span class="keyword">if</span> end ** <span class="number">2</span> &lt;= x:
+            <span class="keyword">return</span> end
+        <span class="keyword">else</span>:
+            <span class="keyword">return</span> start
+</code></pre>
+<p>&emsp;&emsp;感觉这问题是问题1的加强版, 大同小异…<br>&emsp;&emsp;3.一个整数数组(size为n): 相邻位置的数字是不同的, A[0] &lt; A[1] 且 A[n - 2] &gt; A[n - 1]. 假定P是峰值的位置(A[P] &gt; A[P - 1] 且 A[P] &lt; A[P + 1]), 返回数组中任意一个峰值的位置:<br>&emsp;&emsp;答案 - 使用二分查找: 举个栗子, 按照条件可知A中最少有一个波峰([0:n]左端上升右端下降); 假设找到了中点mid处于上升区间(A[mid] &gt; A[mid - 1] 且 A[mid] &lt; A[mid + 1]), 因为[0:mid]两端都是上升, 所以无法肯定[0:mid]中有波峰, 但是[mid:n]因为左端上升右端下降, 所以至少存在一个波峰, 所以用二分查找法在[mid:n]进行查找…<br>&emsp;&emsp;虽然只是微不足道的几个小细节, 但还是要感谢Cifer, 让懒惰的我多想了几步=w=.</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&amp;emsp;&amp;emsp;同Cifer讨论二分查找时遇到的细节问题, 在这里备注一下:&lt;br&gt;&amp;emsp;&amp;emsp;1.如果该(有序的)列表里可能有重复的元素, 那么在二分查找的过程中找到的index值为第一个还是最后一个?&lt;br&gt;&amp;emsp;&amp;emsp;最终代码(假设列表
+    
+    </summary>
+    
+    
+      <category term="algorithm" scheme="https://simon-is-a-slowcoach.github.io/tags/algorithm/"/>
+    
+      <category term="Python" scheme="https://simon-is-a-slowcoach.github.io/tags/Python/"/>
+    
+  </entry>
+  
+</feed>
