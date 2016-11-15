@@ -240,6 +240,108 @@
             
               
                 
+                <a class="post-title-link" href="/2016/11/15/one-trick-for-new-larger-font-and-old-size-label/" itemprop="url">
+                  老项目对于iOS10字体变大问题的一个临时应对措施
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-11-15T23:17:05+08:00" content="2016-11-15">
+              2016-11-15
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/11/15/one-trick-for-new-larger-font-and-old-size-label/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/11/15/one-trick-for-new-larger-font-and-old-size-label/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>&emsp;&emsp;目前维护的老项目还是手写frame(请同情我), 所以在产品支持iOS10的时候自然遇到了因为字体变大导致一些文本内容(如: <code>label.text</code> 和 <code>lable.attributedText</code>)不能显示完整的问题(…此时真的蛮怀念<strong>AutoLayout</strong>, Orz).<br>&emsp;&emsp;那么, 既然时间紧任务重, 而我又太懒, 所以决定AOP一下试试.<br>&emsp;&emsp;经观察发现:<br>&emsp;&emsp;&emsp;&emsp;1.项目里基本上99%以上的UIFont都是通过<code>+ (NSFont *)systemFontOfSize:(CGFloat)fontSize</code>来得到的(说到这里有点想吐槽但还是忍住了);<br>&emsp;&emsp;&emsp;&emsp;2.iOS10之前的系统的默认字体, 其<code>(lineHeight / pointSize)</code> 基本是同一个值: 1.193000f, 而iOS10上的默认字体的这个值是比之前的要大(所以新字体是更大的).<br>&emsp;&emsp;那么, 上代码:<br><figure class="highlight obj-c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">UIFont</span> (<span class="title">Tuning</span>)</span></div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"><span class="keyword">static</span> <span class="built_in">CGFloat</span> lineHeightPerPointOfOldSystemFont = <span class="number">1.193000</span>f;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">UIFont</span> (<span class="title">Tuning</span>)</span></div><div class="line">+ (<span class="keyword">void</span>)load &#123;</div><div class="line">    <span class="keyword">static</span> <span class="built_in">dispatch_once_t</span> onceToken;</div><div class="line">    <span class="built_in">dispatch_once</span>(&amp;onceToken, ^&#123;</div><div class="line">        [<span class="keyword">self</span> swizzleClassMethods];</div><div class="line">    &#125;);</div><div class="line">&#125;</div><div class="line"></div><div class="line">+ (<span class="keyword">void</span>)swizzleClassMethods &#123;</div><div class="line">    <span class="built_in">NSArray</span>&lt;<span class="built_in">NSArray</span>&lt;<span class="built_in">NSString</span> *&gt; *&gt; *selectorStrArr = @[</div><div class="line">            @[<span class="built_in">NSStringFromSelector</span>(<span class="keyword">@selector</span>(systemFontOfSize:)), <span class="built_in">NSStringFromSelector</span>(<span class="keyword">@selector</span>(s_systemFontOfSize:)),],</div><div class="line">            @[<span class="built_in">NSStringFromSelector</span>(<span class="keyword">@selector</span>(boldSystemFontOfSize:)), <span class="built_in">NSStringFromSelector</span>(<span class="keyword">@selector</span>(s_boldSystemFontOfSize:)),],</div><div class="line">            @[<span class="built_in">NSStringFromSelector</span>(<span class="keyword">@selector</span>(italicSystemFontOfSize:)), <span class="built_in">NSStringFromSelector</span>(<span class="keyword">@selector</span>(s_italicSystemFontOfSize:)),],</div><div class="line">    ];</div><div class="line"></div><div class="line">    Class <span class="keyword">class</span> = object_getClass(<span class="keyword">self</span>);</div><div class="line">    <span class="keyword">for</span> (<span class="built_in">NSArray</span>&lt;<span class="built_in">NSString</span> *&gt; *arr <span class="keyword">in</span> selectorStrArr) &#123;</div><div class="line">        <span class="keyword">if</span> (arr.count != <span class="number">2</span>) &#123;</div><div class="line">            <span class="keyword">continue</span>;</div><div class="line">        &#125;</div><div class="line">        SEL originalSelector = <span class="built_in">NSSelectorFromString</span>(arr[<span class="number">0</span>]);</div><div class="line">        SEL swizzledSelector = <span class="built_in">NSSelectorFromString</span>(arr[<span class="number">1</span>]);</div><div class="line">        Method originalMethod = class_getInstanceMethod(<span class="keyword">class</span>, originalSelector);</div><div class="line">        Method swizzledMethod = class_getInstanceMethod(<span class="keyword">class</span>, swizzledSelector);</div><div class="line"></div><div class="line">        <span class="built_in">BOOL</span> didAddMethod = class_addMethod(<span class="keyword">class</span>,</div><div class="line">                originalSelector,</div><div class="line">                method_getImplementation(swizzledMethod),</div><div class="line">                method_getTypeEncoding(swizzledMethod));</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (didAddMethod) &#123;</div><div class="line">            class_replaceMethod(<span class="keyword">class</span>,</div><div class="line">                    swizzledSelector,</div><div class="line">                    method_getImplementation(originalMethod),</div><div class="line">                    method_getTypeEncoding(originalMethod));</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            method_exchangeImplementations(originalMethod, swizzledMethod);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">+ (<span class="built_in">UIFont</span> *)s_systemFontOfSize:(<span class="built_in">CGFloat</span>)fontSize &#123;</div><div class="line">    <span class="built_in">UIFont</span> *font = [<span class="keyword">self</span> s_systemFontOfSize:fontSize];</div><div class="line">    <span class="built_in">CGFloat</span> tunedScaleFactor = [<span class="keyword">self</span> tunedScaleFactorForFontName:font.fontName];</div><div class="line">    <span class="keyword">if</span> (fabs(tunedScaleFactor - <span class="number">1.0</span>f) &gt;= FLT_EPSILON) &#123;</div><div class="line">        font = [<span class="keyword">self</span> s_systemFontOfSize:fontSize * tunedScaleFactor];</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> font;</div><div class="line">&#125;</div><div class="line"></div><div class="line">+ (<span class="built_in">UIFont</span> *)s_boldSystemFontOfSize:(<span class="built_in">CGFloat</span>)fontSize &#123;</div><div class="line">    <span class="built_in">UIFont</span> *font = [<span class="keyword">self</span> s_boldSystemFontOfSize:fontSize];</div><div class="line">    <span class="built_in">CGFloat</span> tunedScaleFactor = [<span class="keyword">self</span> tunedScaleFactorForFontName:font.fontName];</div><div class="line">    <span class="keyword">if</span> (fabs(tunedScaleFactor - <span class="number">1.0</span>f) &gt;= FLT_EPSILON) &#123;</div><div class="line">        font = [<span class="keyword">self</span> s_boldSystemFontOfSize:fontSize * tunedScaleFactor];</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> font;</div><div class="line">&#125;</div><div class="line"></div><div class="line">+ (<span class="built_in">UIFont</span> *)s_italicSystemFontOfSize:(<span class="built_in">CGFloat</span>)fontSize &#123;</div><div class="line">    <span class="built_in">UIFont</span> *font = [<span class="keyword">self</span> s_italicSystemFontOfSize:fontSize];</div><div class="line">    <span class="built_in">CGFloat</span> tunedScaleFactor = [<span class="keyword">self</span> tunedScaleFactorForFontName:font.fontName];</div><div class="line">    <span class="keyword">if</span> (fabs(tunedScaleFactor - <span class="number">1.0</span>f) &gt;= FLT_EPSILON) &#123;</div><div class="line">        font = [<span class="keyword">self</span> s_italicSystemFontOfSize:fontSize * tunedScaleFactor];</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> font;</div><div class="line">&#125;</div><div class="line"></div><div class="line">+ (<span class="built_in">CGFloat</span>) tunedScaleFactorForFontName:(<span class="built_in">NSString</span> *)srcFontName &#123;</div><div class="line">    <span class="built_in">CGFloat</span> scaleFactor;</div><div class="line">    <span class="built_in">CGFloat</span> testFontSize = <span class="number">12.0</span>f;</div><div class="line">    <span class="built_in">UIFont</span> *testFont = [<span class="built_in">UIFont</span> fontWithName:srcFontName size:testFontSize];</div><div class="line">    <span class="keyword">if</span> (!srcFontName || !testFont) &#123;</div><div class="line">        scaleFactor = <span class="number">1.0</span>f;</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        <span class="keyword">if</span> ([<span class="keyword">self</span> scaleFactorDict][srcFontName]) &#123;</div><div class="line">            scaleFactor = [[<span class="keyword">self</span> scaleFactorDict][srcFontName] floatValue];</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="built_in">CGFloat</span> lineHeightPerPointOfSrcFont = testFont.lineHeight / testFontSize;</div><div class="line">            <span class="keyword">if</span> (fabs(lineHeightPerPointOfSrcFont) &lt; FLT_EPSILON || lineHeightPerPointOfSrcFont &lt; lineHeightPerPointOfOldSystemFont || fabs(lineHeightPerPointOfSrcFont - lineHeightPerPointOfOldSystemFont) &lt; FLT_EPSILON) &#123;</div><div class="line">                scaleFactor = <span class="number">1.0</span>f;</div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                scaleFactor = lineHeightPerPointOfOldSystemFont / lineHeightPerPointOfSrcFont * <span class="number">0.95</span>f;<span class="comment">//发现效果没想象中完美所以又打了个九五折</span></div><div class="line">            &#125;</div><div class="line"></div><div class="line">            [<span class="keyword">self</span> scaleFactorDict][srcFontName] = @(scaleFactor);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> scaleFactor;</div><div class="line">&#125;</div><div class="line"></div><div class="line">+ (<span class="built_in">NSMutableDictionary</span>&lt;<span class="built_in">NSString</span> *, <span class="built_in">NSNumber</span> *&gt; *)scaleFactorDict &#123;</div><div class="line">    <span class="keyword">static</span> <span class="built_in">NSMutableDictionary</span> *dict = <span class="literal">nil</span>;</div><div class="line">    <span class="keyword">static</span> <span class="built_in">dispatch_once_t</span> onceToken;</div><div class="line">    <span class="built_in">dispatch_once</span>(&amp;onceToken, ^&#123;</div><div class="line">        dict = [<span class="built_in">NSMutableDictionary</span> dictionary];</div><div class="line">    &#125;);</div><div class="line">    <span class="keyword">return</span> dict;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">@end</span></div></pre></td></tr></table></figure></p>
+<p>&emsp;&emsp;就这样, 效果只能说还好(没有理论上达到完全和以前一样的效果), 勉强算是过关了.</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2016/11/05/something-about-NSDecimalNumber/" itemprop="url">
                   关于NSDecimalNumber的一点总结
                 </a>
@@ -485,7 +587,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">2</span>
+              <span class="site-state-item-count">3</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
